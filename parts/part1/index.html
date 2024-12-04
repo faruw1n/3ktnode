@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Чат на WebSocket</title>
+  <style>
+    #messages {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+    }
+    #inputArea {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Чат</h1>
+  <div id="messages"></div>
+  <div id="inputArea">
+    <input type="text" id="messageInput" placeholder="Введите сообщение" />
+    <button onclick="sendMessage()">Отправить</button>
+  </div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080');
+    const messageInput = document.getElementById('messageInput');
+    const messages = document.getElementById('messages');
+
+    socket.onmessage = function(event) {
+      const message = document.createElement('div');
+      message.textContent = event.data;
+      messages.appendChild(message);
+      messages.scrollTop = messages.scrollHeight; 
+    };
+
+
+    function sendMessage() {
+      const message = messageInput.value;
+      if (message) {
+        socket.send(message);
+        messageInput.value = ''; 
+      }
+    }
+
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

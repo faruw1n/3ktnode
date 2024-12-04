@@ -1,0 +1,45 @@
+<div id="usernameInputArea">
+    <input type="text" id="usernameInput" placeholder="Введите ваше имя" />
+    <button onclick="setUsername()">Войти в чат</button>
+  </div>
+  
+  <script>
+    const socket = new WebSocket('ws://localhost:8080');
+    const messages = document.getElementById('messages');
+    const usernameInput = document.getElementById('usernameInput');
+    const messageInput = document.getElementById('messageInput');
+    const inputArea = document.getElementById('inputArea');
+    const usernameInputArea = document.getElementById('usernameInputArea');
+  
+    let username = null;
+  
+    socket.onmessage = function(event) {
+      const message = document.createElement('div');
+      message.textContent = event.data;
+      messages.appendChild(message);
+      messages.scrollTop = messages.scrollHeight;
+    };
+  
+    function setUsername() {
+      username = usernameInput.value;
+      if (username) {
+        socket.send(username);
+        usernameInputArea.style.display = 'none';
+        inputArea.style.display = 'block';
+      }
+    }
+  
+    function sendMessage() {
+      const message = messageInput.value;
+      if (message && username) {
+        socket.send(message);
+        messageInput.value = '';
+      }
+    }
+  
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
